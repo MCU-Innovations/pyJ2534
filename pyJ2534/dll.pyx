@@ -1,7 +1,7 @@
-import ctypes as ct
+# import ctypes as ct
 from typing import Any
 
-from J2534.dllLoader import MyDll
+# from .dllLoader import MyDll
 
 PassThru_Data = (ct.c_ubyte * 4128)
 

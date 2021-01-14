@@ -2,11 +2,11 @@
 
 import sys
 
-import J2534.dllLoader as dllLIBRARY
-from J2534.dll import *
-import ctypes as ct
-from J2534.Define import *
-from J2534.Error import showERROR
+include "dllLoader.pyx"
+include "dll.pyx"
+
+from .Define import *
+from .Error import showERROR
 
 ptData = PassThru_Data
 
@@ -133,19 +133,19 @@ class GetParameter(SCONFIG_LIST, Parameter):
 class J2534Lib:
 
     def __init__(self):
-        self.Devices = dllLIBRARY.getDevices()
+        self.Devices = getDevices()
         self._module = sys.modules[__name__]
         self.MethodErrorLog = False
 
     def setDevice(self, key=0):
         """[select the device]
-        
+
         Keyword Arguments:
             key {int} -- [the j2534 index in register ] (default: {0})
         """
         device = self.Devices[key]
         self.name = device[0]
-        self.dll = dllLIBRARY.load_dll(device[1])
+        self.dll = load_dll(device[1])
         self.canlib = CanlibDll(self.dll)
 
     def getDevices(self):
@@ -155,7 +155,7 @@ class J2534Lib:
 
     def SetErrorLog(self, state):
         """[on / off the error log]
-        
+
         Arguments:
             state {[bool]} -- [open or close the error log]
         """
@@ -175,7 +175,9 @@ class J2534Lib:
 
 j2534lib = J2534Lib()
 _err = j2534lib.err
-
+SetErrorLog = j2534lib.SetErrorLog
+getDevices = j2534lib.getDevices
+setDevice = j2534lib.setDevice
 
 def ptOpen():
     """[open selected j2534 device]
@@ -264,13 +266,13 @@ def ptStopPeriodicMsg(ChannelID, MsgID):
     return j2534lib.PassThruStopPeriodicMsg(ChannelID, MsgID)
 
 
-def ptStartEcmFilter(ChannelID, ProtocolID, Mask=None, Pattern=None, Flow=None, TxFlag0=0, TxFlag1=0):
+def ptStartEcmFilter(ChannelID, ProtocolID, type=3, Mask=None, Pattern=None, Flow=None, TxFlag0=0, TxFlag1=0):
     """ start the msg filter
     """
 
     pFilterID = ct.c_ulong()
 
-    if ProtocolID == 6:  # check if using protocol ISO15765 if so set flow control filter...
+    if ProtocolID in [5, 6]:  # check if using protocol ISO15765 if so set flow control filter...
         maskMsg = ptMskMsg(ProtocolID, TxFlag0, TxFlag1)
         maskMsg.setData(Mask)
 
@@ -279,7 +281,7 @@ def ptStartEcmFilter(ChannelID, ProtocolID, Mask=None, Pattern=None, Flow=None, 
 
         flowcontrolMsg = ptFlowControlMsg(ProtocolID, TxFlag0, TxFlag1)
         flowcontrolMsg.setData(Flow)
-        ret = j2534lib.PassThruStartMsgFilter(ChannelID, 3, ct.byref(maskMsg), ct.byref(patternMsg),
+        ret = j2534lib.PassThruStartMsgFilter(ChannelID, type, ct.byref(maskMsg), ct.byref(patternMsg),
                                               ct.byref(flowcontrolMsg), ct.byref(pFilterID))
         _err('ptStartMsgFilter', ret)
         return ret, pFilterID.value
@@ -292,7 +294,7 @@ def ptStartEcmFilter(ChannelID, ProtocolID, Mask=None, Pattern=None, Flow=None, 
         patternMsg = ptPatternMsg(ProtocolID, 0)
         patternMsg.SetDataString(Pattern)
 
-        ret = j2534lib.PassThruStartMsgFilter(ChannelID, 1, ct.byref(maskMsg), ct.byref(patternMsg),
+        ret = j2534lib.PassThruStartMsgFilter(ChannelID, type, ct.byref(maskMsg), ct.byref(patternMsg),
                                               ct.c_void_p(None), ct.byref(pFilterID))
         _err('ptStartMsgFilter', ret)
         return ret, pFilterID.value
