@@ -279,10 +279,14 @@ def ptStartEcmFilter(ChannelID, ProtocolID, type=3, Mask=None, Pattern=None, Flo
         patternMsg = ptPatternMsg(ProtocolID, TxFlag0, TxFlag1)
         patternMsg.setData(Pattern)
 
-        flowcontrolMsg = ptFlowControlMsg(ProtocolID, TxFlag0, TxFlag1)
-        flowcontrolMsg.setData(Flow)
-        ret = j2534lib.PassThruStartMsgFilter(ChannelID, type, ct.byref(maskMsg), ct.byref(patternMsg),
-                                              ct.byref(flowcontrolMsg), ct.byref(pFilterID))
+        if type == 3:
+            flowcontrolMsg = ptFlowControlMsg(ProtocolID, TxFlag0, TxFlag1)
+            flowcontrolMsg.setData(Flow)
+            ret = j2534lib.PassThruStartMsgFilter(ChannelID, type, ct.byref(maskMsg), ct.byref(patternMsg),
+                                                  ct.byref(flowcontrolMsg), ct.byref(pFilterID))
+        else:
+            ret = j2534lib.PassThruStartMsgFilter(ChannelID, type, ct.byref(maskMsg), ct.byref(patternMsg),
+                                                  None, ct.byref(pFilterID))
         _err('ptStartMsgFilter', ret)
         return ret, pFilterID.value
 
