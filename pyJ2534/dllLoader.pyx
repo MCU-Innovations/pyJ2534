@@ -64,13 +64,20 @@ class MyDll(object):
 
 def dllGetDevices():
     J2534_Device_Reg_Info = []
+    print("here1")
     try:
+        print("here2")
         BaseKey = winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, r"Software\\WOW6432Node\\PassThruSupport.04.04\\", access=winreg.KEY_READ | winreg.KEY_WOW64_64KEY)
+        print("here3")
     except FileNotFoundError:
         try:
+            print("here4")
             BaseKey = winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, r"Software\\PassThruSupport.04.04\\")
+            print("here5")
         except FileNotFoundError:
+            print("here6")
             BaseKey = None
+    print("here7")
     if BaseKey:
         count = winreg.QueryInfoKey(BaseKey)[0]
         for i in range(count):
