@@ -6,11 +6,6 @@ import sys
 import winreg
 
 
-if platform.architecture()[0] == '32bit':
-    PASSTHRU_REG = r"Software\\PassThruSupport.04.04\\"
-else:
-    PASSTHRU_REG = r"Software\\WOW6432Node\\PassThruSupport.04.04\\"
-
 DEFAULT = object()
 
 
@@ -68,16 +63,21 @@ class MyDll(object):
 
 
 def dllGetDevices():
-
     J2534_Device_Reg_Info = []
-
-    BaseKey = winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, PASSTHRU_REG)
-    count = winreg.QueryInfoKey(BaseKey)[0]
-    for i in range(count):
-        DeviceKey = winreg.OpenKeyEx(BaseKey, winreg.EnumKey(BaseKey, i))
-        Name = winreg.QueryValueEx(DeviceKey, "Name")[0]
-        FunctionLibrary = winreg.QueryValueEx(DeviceKey, "FunctionLibrary")[0]
-        J2534_Device_Reg_Info.append((Name, FunctionLibrary))
+    try:
+        BaseKey = winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, r"Software\\WOW6432Node\\PassThruSupport.04.04\\", access=winreg.KEY_READ | winreg.KEY_WOW64_64KEY)
+    except FileNotFoundError:
+        try:
+            BaseKey = winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, r"Software\\PassThruSupport.04.04\\")
+        except FileNotFoundError:
+            BaseKey = None
+    if BaseKey:
+        count = winreg.QueryInfoKey(BaseKey)[0]
+        for i in range(count):
+            DeviceKey = winreg.OpenKeyEx(BaseKey, winreg.EnumKey(BaseKey, i))
+            Name = winreg.QueryValueEx(DeviceKey, "Name")[0]
+            FunctionLibrary = winreg.QueryValueEx(DeviceKey, "FunctionLibrary")[0]
+            J2534_Device_Reg_Info.append((Name, FunctionLibrary))
     return J2534_Device_Reg_Info
 
 
