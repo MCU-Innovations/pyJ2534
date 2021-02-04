@@ -72,7 +72,7 @@ class Voltage(object):
 
     @staticmethod
     def value(value):
-        # Programming Voltage 
+        # Programming Voltage
         # 0x00001388 5000mV
         # 0x00004E20 20000mV
         return value
@@ -104,6 +104,7 @@ class IoctlID(object):
     P3_MAX = 0x0B  # 0x0-0xFFFF	# ISO-9141/14230 specific, max. ECU response time between end of ECU response and next tester request [02.02-API: ms, 04.04-API: *0.5ms]. 04.04-API: NOT ADJUSTABLE, messages can be sent at anytime after P3_MIN. Default value is 5000 ms.
     P4_MIN = 0x0C  # 0x0-0xFFFF	# ISO-9141/14230 specific, min. tester inter-byte time for a request [02.02-API: ms, 04.04-API: *0.5ms]. Default value is 5 ms.
     P4_MAX = 0x0D  # 0x0-0xFFFF	# ISO-9141/14230 specific, max. tester inter-byte time for a request [02.02-API: ms, 04.04-API: *0.5ms]. 04.04-API: NOT ADJUSTABLE, P4_MIN is always used. Default value is 20 ms.
+    W0 = 0x19 # 0x0-0xFFFF # ISO-9141 (1 ms per bit) [300]
     W1 = 0x0E  # 0x0-0xFFFF	# ISO 9141 specific, max. time [ms] from the address byte end to synchronization pattern start. Default value is 300 ms.
     W2 = 0x0F  # 0x0-0xFFFF	# ISO 9141 specific, max. time [ms] from the synchronization byte end to key byte 1 start. Default value is 20 ms.
     W3 = 0x10  # 0x0-0xFFFF	# ISO 9141 specific, max. time [ms] between key byte 1 and key byte 2. Default value is 20 ms.
@@ -115,18 +116,17 @@ class IoctlID(object):
     PARITY = 0x16  # 0(NO_PARITY)/1(ODD_PARITY)/2(EVEN_PARITY)	# ISO9141 specific, parity type for detecting bit errors.  Default value is 0(NO_PARITY).
     BIT_SAMPLE_POINT = 0x17  # 0-100	# CAN specific, the desired bit sample point as a percentage of bit time. Default value is 80%.
     SYNCH_JUMP_WIDTH = 0x18  # 0-100	# CAN specific, the desired synchronization jump width as a percentage of the bit time. Default value is 15%.
-    W0 = 0x19
     T1_MAX = 0x1A  # 0x0-0xFFFF	# SCI_X_XXXX specific, the max. interframe response delay. Default value is 20 ms.
     T2_MAX = 0x1B  # 0x0-0xFFFF	# SCI_X_XXXX specific, the max. interframe request delay.Default value is 100 ms.
+    T3_MAX = 0x24  # 0x0-0xFFFF	# SCI_X_XXXX specific, the max. interframe request delay.Default value is 50 ms.
     T4_MAX = 0x1C  # 0x0-0xFFFF	# SCI_X_XXXX specific, the max. intermessage response delay. Default value is 20 ms.
     T5_MAX = 0x1D  # 0x0-0xFFFF	# SCI_X_XXXX specific, the max. intermessage request delay. Default value is 100 ms.
     ISO15765_BS = 0x1E  # 0x0-0xFF	# ISO15765 specific, the block size for segmented transfers.
     ISO15765_STMIN = 0x1F  # 0x0-0xFF	# ISO15765 specific, the separation time for segmented transfers.
+    ISO15765_BS_TX = 0x22
+    ISO15765_STMIN_TX = 0x23
     DATA_BITS = 0x20  # 04.04-API only
     FIVE_BAUD_MOD = 0x21
-    BS_TX = 0x22
-    STMIN_TX = 0x23
-    T3_MAX = 0x24
     ISO15765_WFT_MAX = 0x25
 
 
@@ -206,4 +206,3 @@ class Parameter(object):
         T1_MAX, T2_MAX, T3_MAX, T4_MAX, T5_MAX, \
         ISO15765_BS, ISO15765_STMIN, DATA_BITS, FIVE_BAUD_MOD, BS_TX, STMIN_TX, T3_MAX, ISO15765_WFT_MAX
     ]
-

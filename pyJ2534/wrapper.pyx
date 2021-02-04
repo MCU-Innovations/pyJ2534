@@ -133,7 +133,7 @@ class GetParameter(SCONFIG_LIST, Parameter):
 class J2534Lib:
 
     def __init__(self):
-        self.Devices = getDevices()
+        self.Devices = dllGetDevices()
         self._module = sys.modules[__name__]
         self.MethodErrorLog = False
 
@@ -233,7 +233,7 @@ def ptDisconnect(ChannelID):
 def ptReadMsgs(ChannelID, Msgs, NumMsgs, Timeout):
     """ :TODO
     """
-    ret = j2534lib.PassThruReadMsgs(ChannelID, ct.byref(Msgs), ct.byref(ct.c_ulong(NumMsgs)), Timeout)
+    ret = j2534lib.PassThruReadMsgs(ChannelID, ct.byref(Msgs), ct.byref(ct.c_ulong(NumMsgs)), ct.c_ulong(Timeout))
     _err('ptReadMsgs', ret)
     return ret
 
@@ -247,7 +247,7 @@ def ptWtiteMsgs(ChannelID, Msgs, NumMsgs, Timeout):
         NumMsgs {[type]} -- [description]
         Timeout {[type]} -- [description]
     """
-    ret = j2534lib.PassThruWriteMsgs(ChannelID, ct.byref(Msgs), ct.byref(ct.c_ulong(NumMsgs)), Timeout)
+    ret = j2534lib.PassThruWriteMsgs(ChannelID, ct.byref(Msgs), ct.byref(ct.c_ulong(NumMsgs)), ct.c_ulong(Timeout))
     _err('ptWtiteMsgs', ret)
     return ret
 
@@ -272,36 +272,22 @@ def ptStartEcmFilter(ChannelID, ProtocolID, type=3, Mask=None, Pattern=None, Flo
 
     pFilterID = ct.c_ulong()
 
-    if ProtocolID in [5, 6]:  # check if using protocol ISO15765 if so set flow control filter...
-        maskMsg = ptMskMsg(ProtocolID, TxFlag0, TxFlag1)
-        maskMsg.setData(Mask)
+    maskMsg = ptMskMsg(ProtocolID, TxFlag0, TxFlag1)
+    maskMsg.setData(Mask)
 
-        patternMsg = ptPatternMsg(ProtocolID, TxFlag0, TxFlag1)
-        patternMsg.setData(Pattern)
+    patternMsg = ptPatternMsg(ProtocolID, TxFlag0, TxFlag1)
+    patternMsg.setData(Pattern)
 
-        if type == 3:
-            flowcontrolMsg = ptFlowControlMsg(ProtocolID, TxFlag0, TxFlag1)
-            flowcontrolMsg.setData(Flow)
-            ret = j2534lib.PassThruStartMsgFilter(ChannelID, type, ct.byref(maskMsg), ct.byref(patternMsg),
-                                                  ct.byref(flowcontrolMsg), ct.byref(pFilterID))
-        else:
-            ret = j2534lib.PassThruStartMsgFilter(ChannelID, type, ct.byref(maskMsg), ct.byref(patternMsg),
-                                                  None, ct.byref(pFilterID))
-        _err('ptStartMsgFilter', ret)
-        return ret, pFilterID.value
-
-    elif ProtocolID in [1, 7, 9]:  # check if using protocol j1850 if so set pass filter...
-
-        maskMsg = ptMskMsg(ProtocolID, 0)
-        maskMsg.SetDataString(Mask)
-
-        patternMsg = ptPatternMsg(ProtocolID, 0)
-        patternMsg.SetDataString(Pattern)
-
+    if type == 3:
+        flowcontrolMsg = ptFlowControlMsg(ProtocolID, TxFlag0, TxFlag1)
+        flowcontrolMsg.setData(Flow)
+        ret = j2534lib.PassThruStartMsgFilter(ChannelID, type, ct.byref(maskMsg), ct.byref(patternMsg),
+                                              ct.byref(flowcontrolMsg), ct.byref(pFilterID))
+    else:
         ret = j2534lib.PassThruStartMsgFilter(ChannelID, type, ct.byref(maskMsg), ct.byref(patternMsg),
                                               ct.c_void_p(None), ct.byref(pFilterID))
-        _err('ptStartMsgFilter', ret)
-        return ret, pFilterID.value
+    _err('ptStartMsgFilter', ret)
+    return ret, pFilterID.value
 
 
 def ptStartMsgFilter(ChannelID, FilterType, MaskMsg, PatternMsg, FlowControlMsg):

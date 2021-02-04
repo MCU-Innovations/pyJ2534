@@ -67,7 +67,7 @@ class MyDll(object):
             annotate(self, name, *prototype)
 
 
-def getDevices():
+def dllGetDevices():
 
     J2534_Device_Reg_Info = []
 
@@ -84,9 +84,4 @@ def getDevices():
 def load_dll(dll_path=None):
     """Load J2534 Library....
     """
-    try:
-        return ct.WinDLL(dll_path)
-    except WindowsError:
-        MessageBox = ct.windll.user32.MessageBoxW
-        MessageBox(None, 'Error loading j2534 library...', 'Dll Error', 0)
-    return False
+    return ct.WinDLL(dll_path)
