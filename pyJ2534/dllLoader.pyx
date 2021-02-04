@@ -9,7 +9,7 @@ import winreg
 if platform.architecture()[0] == '32bit':
     PASSTHRU_REG = r"Software\\PassThruSupport.04.04\\"
 else:
-    PASSTHRU_REG = r"Software\\Wow6432Node\\PassThruSupport.04.04\\"
+    PASSTHRU_REG = r"Software\\WOW6432Node\\PassThruSupport.04.04\\"
 
 DEFAULT = object()
 
