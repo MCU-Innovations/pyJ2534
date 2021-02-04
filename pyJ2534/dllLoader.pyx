@@ -81,9 +81,13 @@ def dllGetDevices():
     if BaseKey:
         count = winreg.QueryInfoKey(BaseKey)[0]
         for i in range(count):
+            print(i)
             DeviceKey = winreg.OpenKeyEx(BaseKey, winreg.EnumKey(BaseKey, i))
+            print(DeviceKey)
             Name = winreg.QueryValueEx(DeviceKey, "Name")[0]
+            print(Name)
             FunctionLibrary = winreg.QueryValueEx(DeviceKey, "FunctionLibrary")[0]
+            print(FunctionLibrary)
             J2534_Device_Reg_Info.append((Name, FunctionLibrary))
     return J2534_Device_Reg_Info
 
